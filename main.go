@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	topic := "my-topic-go-2"
+	topic := "my-go-topic"
 	partition := 0
 
 	conn, err := kafka.DialLeader(context.Background(), "tcp", "localhost:9093", topic, partition)
@@ -49,6 +49,6 @@ func main() {
 			log.Fatal("failed to write messages:", err)
 		}
 
-		fmt.Println("write message:", message)
+		fmt.Println("writed message:", message)
 	}
 }
