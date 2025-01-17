@@ -25,7 +25,7 @@ func main() {
 	kafkaChann := make(chan string)
 
 	go func() {
-		fmt.Println("Enter message to send to Kafka (Ctrl+C to quit):")
+		fmt.Println("Enter message to send to Kafka:")
 		scanner := bufio.NewScanner(os.Stdin)
 
 		for scanner.Scan() {
@@ -49,6 +49,7 @@ func main() {
 			log.Fatal("failed to write messages:", err)
 		}
 
-		fmt.Println("writed message:", message)
+		fmt.Println("\nsent message:", message)
+		fmt.Println("\nEnter message to sendo to Kafka:")
 	}
 }
