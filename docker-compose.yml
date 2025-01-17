@@ -1,0 +1,52 @@
+services:
+    # app:
+    #   build: .
+    #   container_name: gokafka
+    #   volumes:
+    #     - .:/go/src/
+    #   extra_hosts:
+    #     - "host.docker.internal:172.17.0.1"
+
+    zookeeper:
+        restart: always
+        container_name: kafka-like-zookeeper
+        image: docker.io/bitnami/zookeeper:3.8
+        ports:
+            - '2181:2181'
+        volumes:
+            - 'zookeeper-volume:/bitnami'
+        environment:
+            - ALLOW_ANONYMOUS_LOGIN=yes
+    kafka:
+        restart: always
+        container_name: kafka-like
+        image: docker.io/bitnami/kafka:3.3
+        ports:
+            - '9093:9093'
+        volumes:
+            - 'kafka-volume:/bitnami'
+        environment:
+            - KAFKA_BROKER_ID=1
+            - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+            - ALLOW_PLAINTEXT_LISTENER=yes
+            - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
+            - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:9093
+            - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka:9092,EXTERNAL://localhost:9093
+            - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=CLIENT
+        depends_on:
+            - zookeeper
+    control-center:
+        image: confluentinc/cp-enterprise-control-center:6.0.1
+        hostname: control-center
+        depends_on:
+            - kafka
+        ports:
+            - '9021:9021'
+        environment:
+            CONTROL_CENTER_BOOTSTRAP_SERVERS: 'kafka:9092'
+            CONTROL_CENTER_REPLICATION_FACTOR: 1
+            CONTROL_CENTER_CONNECT_CLUSTER: http://app-connect:8083
+            PORT: 9021
+volumes:
+    kafka-volume:
+    zookeeper-volume:
